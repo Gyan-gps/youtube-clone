@@ -14,6 +14,8 @@ const WatchLaterFun = ({ video }) => {
       .collection(`${userID}-watchlater`)
       .doc(`${video.id}`)
       .set(video);
+      alert("Video Added to WatchLater");
+
     }
     else {
       navigate("/signin");

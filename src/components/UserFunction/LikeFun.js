@@ -14,6 +14,7 @@ const LikeFun = ({ video }) => {
         .collection(`${userID}-like`)
         .doc(`${video.id}`)
         .set(video);
+        alert("Video Added to LikeFolder");
     } else {
       navigate("/signin");
     }
