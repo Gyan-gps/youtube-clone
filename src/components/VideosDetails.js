@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import ReactPlayer from "react-player";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ReactPlayer from "react-player/lazy";
 import { Typography, Box, Stack } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 
@@ -16,12 +16,13 @@ const VideoDetail = () => {
   const [videos, setVideos] = useState(null);
   const { id } = useParams();
   const { theme } = useAllContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     fetchFromAPI(`videos?part=snippet,statistics&id=${id}`).then((data) =>
       setVideoDetail(data.items[0])
     );
-
     fetchFromAPI(`search?part=snippet&relatedToVideoId=${id}&type=video`).then(
       (data) => setVideos(data.items)
     );
@@ -33,9 +34,17 @@ const VideoDetail = () => {
     snippet: { title, channelId, channelTitle },
     statistics: { viewCount, likeCount },
   } = videoDetail;
-  console.log(id);
+  const handleEnded = () => {
+    navigate(
+      videos[0].id.videoId
+        ? `/video/${videos[0].id.videoId}`
+        : `/video/${videos[0].id}`
+    );
+  };
+
+  // console.log(id);
   return (
-    <Box sx={{overflowY:'auto',height:'95vh',flex:2}}>
+    <Box sx={{ overflowY: "auto", height: "95vh", flex: 2 }}>
       <Stack direction={{ xs: "column", md: "row" }}>
         <Box flex={1}>
           <Box
@@ -44,17 +53,20 @@ const VideoDetail = () => {
               position: "sticky",
               top: "5px",
               color: theme.color,
-              ml:1
+              ml: 1,
             }}
           >
             <ReactPlayer
               url={`https://www.youtube.com/watch?v=${id}`}
               className="react-player"
+              playing={true}
               controls
+              // loop={true}
+              onEnded={handleEnded}
             />
             <Typography
               sx={{ color: theme.color }}
-              variant= "h6"
+              variant="h6"
               fontWeight="bold"
               p={2}
             >
@@ -73,18 +85,18 @@ const VideoDetail = () => {
                 alignItems="center"
                 sx={{ color: theme.color }}
               >
-              <Link to={`/channel/${channelId}`}>
-                <Typography
-                  variant={{ sm: "subtitle1", md: "h6" }}
-                  sx={{ color: theme.color }}
-                >
-                  {channelTitle}
-                  <CheckCircleIcon
-                    sx={{ fontSize: "12px", color: "gray", ml: "5px" }}
-                  />
-                </Typography>
-              </Link>
-              
+                <Link to={`/channel/${channelId}`}>
+                  <Typography
+                    variant={{ sm: "subtitle1", md: "h6" }}
+                    sx={{ color: theme.color }}
+                  >
+                    {channelTitle}
+                    <CheckCircleIcon
+                      sx={{ fontSize: "12px", color: "gray", ml: "5px" }}
+                    />
+                  </Typography>
+                </Link>
+
                 <LikeFun video={videoDetail} />
                 <WatchLaterFun video={videoDetail} />
               </Stack>
